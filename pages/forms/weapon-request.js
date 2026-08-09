@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 const DEPARTMENTS = [
-  { id: 'ib', name: 'IB (Intelligence Branch)', emoji: '🕵️' },
-  { id: 'cid', name: 'CID (Criminal Investigation Department)', emoji: '🔍' },
-  { id: 'fa', name: 'FA (Free Agent)', emoji: '🆓' },
-  { id: 'hrt', name: 'HRT (Hostage Rescue Team)', emoji: '🛡️' },
-  { id: 'atf', name: 'ATF (Anti Terrorism Force)', emoji: '💥' },
-  { id: 'af', name: 'AF (Air Force)', emoji: '✈️' },
-  { id: 'ocu', name: 'OCU (Organized Crime Unit)', emoji: '⚖️' },
-  { id: 'dea', name: 'DEA (Drug Enforcement Administration)', emoji: '💊' },
-  { id: 'fna', name: 'FNA (Federal National Academy)', emoji: '📚' },
-  { id: 'nsb', name: 'NSB (National Security Branch)', emoji: '🏛️' },
-  { id: 'trainee', name: 'Trainee (Стажёр)', emoji: '📖' },
+  { id: 'db', name: 'DB', emoji: '🕵️' },
+  { id: 'spd', name: 'SPD', emoji: '🚔' },
+  { id: 'sai', name: 'SAI', emoji: '🔍' },
+  { id: 'sa', name: 'SA', emoji: '🎓' },
   { id: 'k9', name: 'K9', emoji: '🐕' },
-  { id: 'db', name: 'DB (Detective Bureau)', emoji: '🕵️‍♂️' }
+  { id: 'seb', name: 'SEB', emoji: '💥' },
+  { id: 'iad', name: 'IAD', emoji: '⚖️' },
+  { id: 'af', name: 'AF', emoji: '✈️' },
+  { id: 'ted', name: 'TED', emoji: '🔫' },
+  { id: 'dvd', name: 'DVD', emoji: '🚗' },
+  { id: 'srt', name: 'SRT', emoji: '🛡️' },
+  { id: 'nred', name: 'NRED', emoji: '🚨' },
+  { id: 'med', name: 'MED', emoji: '🏥' },
+  { id: 'halt', name: 'HALT', emoji: '🚁' }
 ];
 
 const RANKS = [
