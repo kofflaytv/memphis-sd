@@ -60,7 +60,7 @@ export default function ReportForm() {
     e.preventDefault();
 
     if (showInstructorField && formData.isInstructor !== 'yes') {
-      alert('⚠️ Для повышения на 9 или 10 ранг необходимо подтвердить назначение на инструктора!');
+      alert('⚠️ Для повышения на 10 ранг необходимо быть назначенным на инструктора');
       return;
     }
 
