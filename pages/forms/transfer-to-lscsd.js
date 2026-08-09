@@ -40,7 +40,7 @@ export default function TransferToFibForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'transfer-to-fib',
+          type: 'transfer-to-lscsd',
           fullName: formData.fullName,
           approvalProof: formData.approvalProof,
           rankProof: formData.rankProof
