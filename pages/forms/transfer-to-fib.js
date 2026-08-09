@@ -48,7 +48,7 @@ export default function TransferToFibForm() {
       });
 
       if (res.ok) {
-        alert('✅ Заявка на перевод в FIB успешно отправлена!');
+        alert('✅ Заявка на перевод в LSCSD успешно отправлена!');
         router.push('/dashboard');
       } else {
         const error = await res.json();
@@ -77,7 +77,7 @@ export default function TransferToFibForm() {
       </button>
       
       <div className="form-container">
-        <h1>🏛️ Перевод в FIB</h1>
+        <h1>🏛️ Перевод в LSCSD</h1>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
