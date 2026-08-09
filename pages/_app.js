@@ -4,7 +4,7 @@ export default function App({ Component, pageProps }) {
   useEffect(() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:9999;';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:0;';
     document.body.appendChild(canvas);
 
     let width, height;
