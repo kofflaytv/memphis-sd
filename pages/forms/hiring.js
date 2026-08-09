@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 
 const EXPERIENCE_OPTIONS = [
   'Нет опыта',
-  'Был в полиции',
+  'Был в LSPD',
   'Был в FIB',
-  'Был в армии',
+  'Был в SANG',
   'Другое'
 ];
 
@@ -106,7 +106,7 @@ export default function HiringForm() {
       </button>
       
       <div className="form-container">
-        <h1>📝 Трудоустройство в FIB</h1>
+        <h1>📝 Трудоустройство в LSCSD</h1>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
