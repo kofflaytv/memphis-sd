@@ -69,10 +69,10 @@ export default function Home() {
       }}>
         <div style={{ fontSize: '64px', marginBottom: '20px' }}>🔰</div>
         <h1 style={{ color: 'white', fontSize: '32px', marginBottom: '10px', fontWeight: 700 }}>
-          Majestic FIB Boston
+          Majestic LSCSD Boston
         </h1>
         <p style={{ color: '#8b8ba7', marginBottom: '35px', fontSize: '16px' }}>
-          Система подачи заявок FIB
+          Система подачи заявок LSCSD
         </p>
         
         {error && (
