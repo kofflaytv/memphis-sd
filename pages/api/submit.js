@@ -166,12 +166,12 @@ function buildFields(type, department, targetDepartment, data, leaveType, userId
   if (type === 'leave') {
     const d = DEPARTMENTS[department];
     return [
-      { name: '📋 Тип', value: leaveType === 'ooc' ? '🌍 OOC' : '🎮 IC', inline: false },
-      { name: '👤 Имя', value: data.fullName || '-', inline: false },
-      { name: '🏢 Отдел', value: d ? d.emoji + ' ' + d.name : (department || '-'), inline: false },
-      { name: '📝 Причина', value: data.reason || '-', inline: false },
-      { name: '📅 С', value: data.startDate || '-', inline: true },
-      { name: '📅 По', value: data.endDate || '-', inline: true },
+      { name: '📋 Тип отпуска', value: leaveType === 'ooc' ? '🌍 OOC' : '🎮 IC', inline: false },
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🏢 Отдел', value: d ? d.emoji + ' ' + d.name : (department || 'Не указан'), inline: false },
+      { name: '📝 Причина отпуска', value: data.reason || 'Не указано', inline: false },
+      { name: '📅 Дата начала', value: data.startDate || 'Не указано', inline: true },
+      { name: '📅 Дата окончания', value: data.endDate || 'Не указано', inline: true },
       ...base
     ];
   }
@@ -179,91 +179,91 @@ function buildFields(type, department, targetDepartment, data, leaveType, userId
   if (type === 'report') {
     const d = DEPARTMENTS[department];
     return [
-      { name: '👤 Имя', value: data.fullName || '-', inline: false },
-      { name: '🏢 Отдел', value: d ? d.emoji + ' ' + d.name : '-', inline: false },
-      { name: '📌 Текущий ранг', value: data.currentRank || '-', inline: false },
-      { name: '🎯 Целевой ранг', value: data.targetRank || '-', inline: false },
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🏢 Отдел', value: d ? d.emoji + ' ' + d.name : 'Не указан', inline: false },
+      { name: '📌 Текущий ранг', value: data.currentRank || 'Не указан', inline: false },
+      { name: '🎯 Целевой ранг', value: data.targetRank || 'Не указан', inline: false },
       { name: '👨‍🏫 Инструктор', value: data.isInstructor === 'yes' ? '✅ Да' : '❌ Нет', inline: false },
-      { name: '🔗 Ссылки', value: data.workLinks || '-', inline: false },
+      { name: '🔗 Ссылки на работу', value: data.workLinks || 'Не указаны', inline: false },
       ...base
     ];
   }
 
   if (type === 'promotion') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '📊 Ранги', value: data.rankRange || '-', inline: false },
-    { name: '🔗 Отчёт', value: data.reportLink || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
+    { name: '🔗 Ссылка на отчет', value: data.reportLink || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'highrank') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '📊 Ранги', value: data.rankRange || '-', inline: false },
-    { name: '🔗 Работа', value: data.workLink || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
+    { name: '🔗 Ссылка на работу', value: data.workLink || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'resignation') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '📸 Планшет', value: data.screenshot || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '📸 Скриншот планшета', value: data.screenshot || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'reinstatement') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '📌 Ранг при увольнении', value: data.rankAtDismissal || '-', inline: false },
-    { name: '📸 Док-во ранга', value: data.rankProof || '-', inline: false },
-    { name: '⚠️ Ban/Warn', value: data.wasWarned === 'yes' ? '✅ Да' : '❌ Нет', inline: false },
-    ...(data.wasWarned === 'yes' ? [{ name: '📄 State Fractions', value: data.stateFractionsProof || '-', inline: false }] : []),
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '📌 Ранг на момент увольнения', value: data.rankAtDismissal || 'Не указан', inline: false },
+    { name: '📸 Доказательство ранга', value: data.rankProof || 'Не указано', inline: false },
+    { name: '⚠️ Уволен после Ban/Warn', value: data.wasWarned === 'yes' ? '✅ Да' : '❌ Нет', inline: false },
+    ...(data.wasWarned === 'yes' ? [{ name: '📄 Скрин одобрения State Fractions', value: data.stateFractionsProof || 'Не указано', inline: false }] : []),
     ...base
   ];
 
   if (type === 'transfer-to-lscsd') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '✅ Одобрение', value: data.approvalProof || '-', inline: false },
-    { name: '📸 Ранг', value: data.rankProof || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '✅ Одобрение перевода от начальства', value: data.approvalProof || 'Не указано', inline: false },
+    { name: '📸 Доказательство ранга', value: data.rankProof || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'hiring') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '🎂 Возраст', value: data.age || '-', inline: false },
-    { name: '💼 Опыт', value: data.experience || '-', inline: false },
-    { name: '📚 Законы', value: (data.lawKnowledge||'?') + '/10', inline: false },
-    { name: '🪪 Паспорт', value: data.passport || '-', inline: false },
-    { name: '🎖️ Военный', value: data.militaryId || '-', inline: false },
-    { name: '🏥 Мед.', value: data.medical || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '🎂 Возраст (RP)', value: data.age || 'Не указан', inline: false },
+    { name: '💼 Опыт работы в гос. структурах', value: data.experience || 'Не указан', inline: false },
+    { name: '📚 Знание законов RP', value: (data.lawKnowledge||'?') + '/10', inline: false },
+    { name: '🪪 Скриншот паспорта', value: data.passport || 'Не указано', inline: false },
+    { name: '🎖️ Скриншот военного билета', value: data.militaryId || 'Не указано', inline: false },
+    { name: '🏥 Скриншот мед. справок', value: data.medical || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'weapon-request') return [
-    { name: '👤 Имя', value: data.fullName || '-', inline: false },
-    { name: '🏢 Отдел', value: data.department || '-', inline: false },
-    { name: '📌 Ранг', value: data.rank || '-', inline: false },
-    { name: '🔫 Оружие', value: data.weapon || '-', inline: false },
+    { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+    { name: '🏢 Отдел', value: data.department || 'Не указан', inline: false },
+    { name: '📌 Ранг', value: data.rank || 'Не указан', inline: false },
+    { name: '🔫 Запрашиваемое оружие', value: data.weapon || 'Не указано', inline: false },
     ...base
   ];
 
   if (type === 'transfer') {
     const f = [
-      { name: '👤 Имя', value: data.fullName || '-', inline: false },
-      { name: '📌 Ранг', value: data.rank || '-', inline: false },
-      { name: '🏢 Текущий', value: data.currentDepartment || '-', inline: false },
-      { name: '🎯 Желаемый', value: targetDepartment || '-', inline: false },
-      { name: '📝 Причина', value: data.reason || '-', inline: false }
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
+      { name: '🏢 Текущий отдел', value: data.currentDepartment || 'Не указано', inline: false },
+      { name: '🎯 Желаемый отдел', value: targetDepartment || 'Не указано', inline: false },
+      { name: '📝 Причина перевода', value: data.reason || 'Не указано', inline: false }
     ];
     if (targetDepartment === 'db') f.push(
-      { name: '📋 Что такое DB?', value: data.dbWhatIs || '-', inline: false },
-      { name: '📋 Опыт работы в DB?', value: data.dbExperience || '-', inline: false },
-      { name: '📋 Примеры работ', value: data.dbExamples || '-', inline: false },
-      { name: '📋 Серверы с DB', value: data.dbServers || '-', inline: false },
+      { name: '📋 Чем занимается DB?', value: data.dbWhatIs || 'Не указано', inline: false },
+      { name: '📋 Опыт работы в DB?', value: data.dbExperience || 'Не указано', inline: false },
+      { name: '📋 Примеры работ', value: data.dbExamples || 'Не указано', inline: false },
+      { name: '📋 Серверы с DB', value: data.dbServers || 'Не указано', inline: false },
       { name: '📋 Знания по работе DB (1-10)', value: (data.dbKnowledge||'?') + '/10', inline: false },
       { name: '📋 Знания по законке (1-10)', value: (data.dbLawKnowledge||'?') + '/10', inline: false }
     );
     f.push(...base); return f;
   }
 
-  return [...base, ...Object.entries(data).map(([k,v]) => ({ name: k, value: String(v) || '-', inline: false }))];
+  return [...base, ...Object.entries(data).map(([k,v]) => ({ name: k, value: String(v) || 'Не указано', inline: false }))];
 }
 
 async function sendBanWordAlert(user, badWords, fullText, type, req) {
