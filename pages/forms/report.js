@@ -41,7 +41,7 @@ export default function ReportForm() {
   });
 
   const targetRankNum = parseInt(formData.targetRank);
-  const showInstructorField = (targetRankNum === 9 || targetRankNum === 10) && formData.department !== 'fa';
+  const showInstructorField = targetRankNum === 10;
 
   useEffect(() => {
     fetch('/api/me')
