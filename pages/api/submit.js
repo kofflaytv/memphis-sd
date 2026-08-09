@@ -122,8 +122,21 @@ export default async function handler(req, res) {
   };
 
   const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'LSCSD Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
-  if (result.success) res.status(200).json({ success: true });
-  else res.status(500).json({ error: `Не удалось отправить: ${result.error}` });
+
+  if (result.success) {
+    // Статистика и история
+    const today = new Date().toISOString().split('T')[0];
+    await kv.incr('lscsd:stats:total');
+    await kv.incr(`lscsd:stats:${today}`);
+    await kv.lpush(`lscsd:history:${user.id}`, JSON.stringify({
+      type, title: embed.title, date: new Date().toISOString(), id: Date.now().toString(36)
+    }));
+    await kv.ltrim(`lscsd:history:${user.id}`, 0, 49);
+
+    res.status(200).json({ success: true });
+  } else {
+    res.status(500).json({ error: `Не удалось отправить: ${result.error}` });
+  }
 }
 
 function getFormTitle(type, department, targetDepartment, leaveType) {
