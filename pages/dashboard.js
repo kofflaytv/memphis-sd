@@ -36,7 +36,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="header">
-        <h1>🏛️ Majestic FIB Forms</h1>
+        <h1>🏛️ Majestic LSCSD Forms</h1>
         <div className="user-info">
           <img 
             src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} 
@@ -75,8 +75,8 @@ export default function Dashboard() {
 
         <div className="card" onClick={() => router.push('/forms/hiring')}>
           <div className="card-icon">📝</div>
-          <h3>Трудоустройство в FIB</h3>
-          <p>Подать заявку на вступление в FIB</p>
+          <h3>Трудоустройство в LSCSD</h3>
+          <p>Подать заявку на вступление в LSCSD</p>
         </div>
               
         <div className="card" onClick={() => router.push('/forms/high-rank-report')}>
@@ -88,13 +88,13 @@ export default function Dashboard() {
         <div className="card" onClick={() => router.push('/forms/resignation')}>
           <div className="card-icon">🚪</div>
           <h3>Заявление на увольнение</h3>
-          <p>Подать заявление на увольнение из FIB</p>
+          <p>Подать заявление на увольнение из LSCSD</p>
         </div>
 
         <div className="card" onClick={() => router.push('/forms/reinstatement')}>
           <div className="card-icon">🔄</div>
-          <h3>Восстановление в FIB</h3>
-          <p>Подать заявку на восстановление в FIB</p>
+          <h3>Восстановление в LSCSD</h3>
+          <p>Подать заявку на восстановление в LSCSD</p>
         </div>
 
           <div className="card" onClick={() => router.push('/forms/leave')}>
@@ -103,10 +103,10 @@ export default function Dashboard() {
           <p>Подать заявление на OOC или IC отпуск</p>
         </div>
 
-        <div className="card" onClick={() => router.push('/forms/transfer-to-fib')}>
+        <div className="card" onClick={() => router.push('/forms/transfer-to-LSCSD')}>
           <div className="card-icon">🏛️</div>
-          <h3>Перевод в FIB</h3>
-          <p>Подать заявку на перевод в FIB из другой организации</p>
+          <h3>Перевод в LSCSD</h3>
+          <p>Подать заявку на перевод в LSCSD из другой организации</p>
         </div>
       </div>
 
