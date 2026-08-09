@@ -59,10 +59,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const isLocked = await kv.get('lscsd:global:locked');
-  if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||3600)/60)} мин.` }); }
+  if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||1800)/60)} мин.` }); }
   const gc = await kv.get('lscsd:global:requests');
   const ngc = gc ? parseInt(gc) + 1 : 1;
-if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 30 минут.' }); }
+  if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 30 минут.' }); }
   await kv.set('lscsd:global:requests', ngc, { ex: 20 });
 
   const user = verifyToken(req.cookies.token);
@@ -95,7 +95,9 @@ if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv
     if (dept.roleId) roleMentions += `<@&${dept.roleId}> `; if (dept.roleId2) roleMentions += `<@&${dept.roleId2}>`;
   } else if (type === 'transfer') {
     webhookUrl = TRANSFER_WEBHOOKS[targetDepartment]; if (!webhookUrl) return res.status(500).json({ error: 'Вебхук не настроен' });
-    roleMentions = '<@&1525425998370177074> <@&1514608350837346338>';
+    const di = DEPARTMENTS[targetDepartment];
+    if (di?.roleId) roleMentions += `<@&${di.roleId}> `;
+    if (di?.roleId2) roleMentions += `<@&${di.roleId2}>`;
   } else if (type === 'highrank') { webhookUrl = webhooks.highrank; roleMentions = '<@&1525425998370177074> <@&1514608350837346338>'; }
   else if (type === 'resignation') { webhookUrl = webhooks.resignation; roleMentions = '<@&1514608350820827273>'; }
   else if (type === 'reinstatement') { webhookUrl = webhooks.reinstatement; roleMentions = '<@&1514608350820827273>'; }
@@ -124,7 +126,6 @@ if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv
   const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'LSCSD Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
 
   if (result.success) {
-    // Статистика и история
     const today = new Date().toISOString().split('T')[0];
     await kv.incr('lscsd:stats:total');
     await kv.incr(`lscsd:stats:${today}`);
@@ -132,7 +133,6 @@ if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv
       type, title: embed.title, date: new Date().toISOString(), id: Date.now().toString(36)
     }));
     await kv.ltrim(`lscsd:history:${user.id}`, 0, 49);
-
     res.status(200).json({ success: true });
   } else {
     res.status(500).json({ error: `Не удалось отправить: ${result.error}` });
@@ -140,16 +140,16 @@ if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv
 }
 
 function getFormTitle(type, department, targetDepartment, leaveType) {
-  if (type === 'report') { const d = DEPARTMENTS[department]; return `📋 Отчёт • ${d ? d.emoji + ' ' + d.name : 'Отдел'}`; }
-  if (type === 'transfer') { const n = { db:'DB',spd:'SPD',sai:'SAI',k9:'K9',seb:'SEB',iad:'IAD',af:'AF',ted:'TED',dvd:'DVD',srt:'SRT',nred:'NRED',med:'MED',halt:'HALT' }; return `🔄 Перевод в ${n[targetDepartment]||'Отдел'}`; }
-  if (type === 'highrank') return '🌟 Хай Ранги';
-  if (type === 'resignation') return '🚪 Увольнение';
-  if (type === 'reinstatement') return '🔄 Восстановление';
+  if (type === 'report') { const d = DEPARTMENTS[department]; return `📋 Отчёт о повышении • ${d ? d.emoji + ' ' + d.name : 'Отдел'}`; }
+  if (type === 'transfer') { const n = { db:'DB',spd:'SPD',sai:'SAI',k9:'K9',seb:'SEB',iad:'IAD',af:'AF',ted:'TED',dvd:'DVD',srt:'SRT',nred:'NRED',med:'MED',halt:'HALT' }; return `🔄 Запрос на перевод в ${n[targetDepartment]||'Отдел'}`; }
+  if (type === 'highrank') return '🌟 Отчёт на повышение (Хай Ранги)';
+  if (type === 'resignation') return '🚪 Заявление на увольнение';
+  if (type === 'reinstatement') return '🔄 Восстановление в LSCSD';
   if (type === 'transfer-to-lscsd') return '🏛️ Перевод в LSCSD';
-  if (type === 'hiring') return '📝 Трудоустройство';
-  if (type === 'weapon-request') return '🔫 Спец вооружение';
+  if (type === 'hiring') return '📝 Трудоустройство в LSCSD';
+  if (type === 'weapon-request') return '🔫 Запрос на спец вооружение';
   if (type === 'leave') return `🏖️ ${leaveType === 'ooc' ? 'OOC' : 'IC'} Отпуск`;
-  return '📈 Повышение';
+  return '📈 Запрос на повышение';
 }
 
 function getFormColor(type) {
