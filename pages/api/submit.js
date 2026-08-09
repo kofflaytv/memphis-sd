@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||3600)/60)} мин.` }); }
   const gc = await kv.get('lscsd:global:requests');
   const ngc = gc ? parseInt(gc) + 1 : 1;
-  if (ngc > 5) { await kv.set('lscsd:global:locked', '1', { ex: 3600 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 1 час.' }); }
+if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 30 минут.' }); }
   await kv.set('lscsd:global:requests', ngc, { ex: 20 });
 
   const user = verifyToken(req.cookies.token);
