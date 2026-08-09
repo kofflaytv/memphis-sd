@@ -95,18 +95,18 @@ export default async function handler(req, res) {
     if (dept.roleId) roleMentions += `<@&${dept.roleId}> `; if (dept.roleId2) roleMentions += `<@&${dept.roleId2}>`;
   } else if (type === 'transfer') {
     webhookUrl = TRANSFER_WEBHOOKS[targetDepartment]; if (!webhookUrl) return res.status(500).json({ error: 'Вебхук не настроен' });
-    const di = DEPARTMENTS[targetDepartment]; if (di?.roleId) roleMentions += `<@&${di.roleId}> `; if (di?.roleId2) roleMentions += `<@&${di.roleId2}>`;
-  } else if (type === 'highrank') { webhookUrl = webhooks.highrank; roleMentions = '<@&1514689884437090505>'; }
-  else if (type === 'resignation') { webhookUrl = webhooks.resignation; roleMentions = '<@&1514608350837346334>'; }
-  else if (type === 'reinstatement') { webhookUrl = webhooks.reinstatement; roleMentions = '<@&1514608350837346334> <@&1514689884437090505>'; }
-  else if (type === 'transfer-to-lscsd') { webhookUrl = webhooks['transfer-to-lscsd']; roleMentions = '<@&1514608350837346334> <@&1514689884437090505>'; }
-  else if (type === 'hiring') { webhookUrl = webhooks.hiring; roleMentions = '<@&1514608350837346334>'; }
-  else if (type === 'weapon-request') { webhookUrl = webhooks['weapon-request']; roleMentions = '<@&1514608350837346334>'; }
+    roleMentions = '<@&1525425998370177074> <@&1514608350837346338>';
+  } else if (type === 'highrank') { webhookUrl = webhooks.highrank; roleMentions = '<@&1525425998370177074> <@&1514608350837346338>'; }
+  else if (type === 'resignation') { webhookUrl = webhooks.resignation; roleMentions = '<@&1514608350820827273>'; }
+  else if (type === 'reinstatement') { webhookUrl = webhooks.reinstatement; roleMentions = '<@&1514608350820827273>'; }
+  else if (type === 'transfer-to-lscsd') { webhookUrl = webhooks['transfer-to-lscsd']; roleMentions = '<@&1525425998370177074> <@&1514608350837346338>'; }
+  else if (type === 'hiring') { webhookUrl = webhooks.hiring; roleMentions = '<@&1514608350820827274> <@&1514689909317697556>'; }
+  else if (type === 'weapon-request') { webhookUrl = webhooks['weapon-request']; roleMentions = '<@&1525425998370177074> <@&1514733249409060876>'; }
   else if (type === 'leave') {
     webhookUrl = webhooks.leave;
     const di = DEPARTMENTS[department];
     if (di?.roleId) roleMentions += `<@&${di.roleId}> `; if (di?.roleId2) roleMentions += `<@&${di.roleId2}>`;
-  } else { webhookUrl = webhooks.promotion; roleMentions = '<@&1514608350837346334>'; }
+  } else { webhookUrl = webhooks.promotion; roleMentions = '<@&1514608350820827273>'; }
   if (!webhookUrl) return res.status(500).json({ error: 'Вебхук не настроен' });
 
   const ipCount = await kv.get(`lscsd:spam:ip:${ip}`);
