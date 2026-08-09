@@ -241,11 +241,11 @@ function buildFields(type, department, targetDepartment, data, leaveType, userId
     ];
     if (targetDepartment === 'db') f.push(
       { name: '📋 Что такое DB?', value: data.dbWhatIs || '-', inline: false },
-      { name: '📋 Опыт в DB', value: data.dbExperience || '-', inline: false },
-      { name: '📋 Примеры', value: data.dbExamples || '-', inline: false },
-      { name: '📋 Серверы', value: data.dbServers || '-', inline: false },
-      { name: '📋 Знания DB', value: (data.dbKnowledge||'?') + '/10', inline: false },
-      { name: '📋 Законка', value: (data.dbLawKnowledge||'?') + '/10', inline: false }
+      { name: '📋 Опыт работы в DB?', value: data.dbExperience || '-', inline: false },
+      { name: '📋 Примеры работ', value: data.dbExamples || '-', inline: false },
+      { name: '📋 Серверы с DB', value: data.dbServers || '-', inline: false },
+      { name: '📋 Знания по работе DB (1-10)', value: (data.dbKnowledge||'?') + '/10', inline: false },
+      { name: '📋 Знания по законке (1-10)', value: (data.dbLawKnowledge||'?') + '/10', inline: false }
     );
     f.push(...base); return f;
   }
