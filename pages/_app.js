@@ -1,10 +1,17 @@
 import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
+
   useEffect(() => {
+    if (router.pathname.startsWith('/forms') || router.pathname.startsWith('/admin') || router.pathname === '/history') {
+      return;
+    }
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:0;';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:9999;';
     document.body.appendChild(canvas);
 
     let width, height;
@@ -77,7 +84,7 @@ export default function App({ Component, pageProps }) {
     }
     animate();
     return () => canvas.remove();
-  }, []);
+  }, [router.pathname]);
 
   return (
     <>
@@ -89,10 +96,7 @@ export default function App({ Component, pageProps }) {
         }
         input, textarea, button { font-family: inherit; }
         a, button, input, textarea, select, [onclick], .card, .back-btn, .submit-btn, .logout-btn, .copy-btn { cursor: pointer; }
-        select option {
-          background: #1a1a3e;
-          color: white;
-        }
+        select option { background: #1a1a3e; color: white; }
       `}</style>
       <Component {...pageProps} />
     </>
