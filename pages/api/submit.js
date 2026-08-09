@@ -4,6 +4,8 @@ import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwor
 import { checkSpam } from '../../lib/antispam';
 import { kv } from '@vercel/kv';
 
+const WHITELIST = ['200102286473691139'];
+
 const DEPARTMENTS = {
   'db': { name: 'DB', emoji: '🕵️', roleId: '1514608350837346334', roleId2: '1514689884437090505', webhook: process.env.WEBHOOK_REPORT_DB },
   'spd': { name: 'SPD', emoji: '🚔', roleId: '1514608350820827275', roleId2: '1514689954733887591', webhook: process.env.WEBHOOK_REPORT_SPD },
@@ -47,39 +49,44 @@ async function sendToDiscord(webhookUrl, data, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       const res = await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (res.ok) return { success: true, status: res.status };
+      if (res.ok) return { success: true };
       if (res.status === 429) { await new Promise(r => setTimeout(r, (parseInt(res.headers.get('Retry-After')) || 5) * 1000)); continue; }
-      return { success: false, status: res.status, error: await res.text() };
+      return { success: false, error: await res.text() };
     } catch (e) { lastError = e; if (i < retries - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
   }
-  return { success: false, error: lastError?.message || 'Неизвестная ошибка' };
+  return { success: false, error: lastError?.message };
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const isLocked = await kv.get('lscsd:global:locked');
-  if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||1800)/60)} мин.` }); }
-  const gc = await kv.get('lscsd:global:requests');
-  const ngc = gc ? parseInt(gc) + 1 : 1;
-  if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 30 минут.' }); }
-  await kv.set('lscsd:global:requests', ngc, { ex: 20 });
-
   const user = verifyToken(req.cookies.token);
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
   const ip = req.headers['x-vercel-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-  if (await isBlacklisted(user.id, ip)) return res.status(403).json({ error: '⛔ Вы заблокированы.' });
+  const isWhitelisted = WHITELIST.includes(user.id);
 
-  const spamCheck = await checkSpam(user.id, ip);
-  if (spamCheck.isSpam) { if (spamCheck.ban) await addToBlacklist(user.id, user.username, spamCheck.reason, ip); return res.status(429).json({ error: spamCheck.message }); }
+  // Все проверки только для не-белого списка
+  if (!isWhitelisted) {
+    const isLocked = await kv.get('lscsd:global:locked');
+    if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||1800)/60)} мин.` }); }
+    const gc = await kv.get('lscsd:global:requests');
+    const ngc = gc ? parseInt(gc) + 1 : 1;
+    if (ngc > 10) { await kv.set('lscsd:global:locked', '1', { ex: 1800 }); await kv.del('lscsd:global:requests'); return res.status(429).json({ error: '🚫 Сайт заблокирован на 30 минут.' }); }
+    await kv.set('lscsd:global:requests', ngc, { ex: 20 });
+
+    if (await isBlacklisted(user.id, ip)) return res.status(403).json({ error: '⛔ Вы заблокированы.' });
+
+    const spamCheck = await checkSpam(user.id, ip);
+    if (spamCheck.isSpam) { if (spamCheck.ban) await addToBlacklist(user.id, user.username, spamCheck.reason, ip); return res.status(429).json({ error: spamCheck.message }); }
+  }
 
   const { type, leaveType, ...formData } = req.body;
   const department = formData.department;
   const targetDepartment = formData.targetDepartment;
 
   const allText = Object.values(formData).filter(v => typeof v === 'string').join(' ');
-  if (containsBadWords(allText)) {
+  if (!isWhitelisted && containsBadWords(allText)) {
     const fw = findAllBadWords(allText); const f = findBadWord(allText);
     await sendBanWordAlert(user, f || fw.join(', '), allText, type, req);
     await addToBlacklist(user.id, user.username, `Банворд: ${f || fw.join(', ')}`, ip);
@@ -111,8 +118,10 @@ export default async function handler(req, res) {
   } else { webhookUrl = webhooks.promotion; roleMentions = '<@&1514608350820827273>'; }
   if (!webhookUrl) return res.status(500).json({ error: 'Вебхук не настроен' });
 
-  const ipCount = await kv.get(`lscsd:spam:ip:${ip}`);
-  if (ipCount && parseInt(ipCount) >= 5) return res.status(429).json({ error: '🚫 Слишком много с IP.' });
+  if (!isWhitelisted) {
+    const ipCount = await kv.get(`lscsd:spam:ip:${ip}`);
+    if (ipCount && parseInt(ipCount) >= 5) return res.status(429).json({ error: '🚫 Слишком много с IP.' });
+  }
 
   const embed = {
     title: getFormTitle(type, department, targetDepartment, leaveType),
@@ -129,9 +138,7 @@ export default async function handler(req, res) {
     const today = new Date().toISOString().split('T')[0];
     await kv.incr('lscsd:stats:total');
     await kv.incr(`lscsd:stats:${today}`);
-    await kv.lpush(`lscsd:history:${user.id}`, JSON.stringify({
-      type, title: embed.title, date: new Date().toISOString(), id: Date.now().toString(36)
-    }));
+    await kv.lpush(`lscsd:history:${user.id}`, JSON.stringify({ type, title: embed.title, date: new Date().toISOString(), id: Date.now().toString(36) }));
     await kv.ltrim(`lscsd:history:${user.id}`, 0, 49);
     res.status(200).json({ success: true });
   } else {
