@@ -7,28 +7,49 @@ export default async function handler(req, res) {
 
   const key = `lscsd:profile:${user.id}`;
 
-  // GET — получить профиль
   if (req.method === 'GET') {
     try {
       const data = await kv.get(key);
-      res.status(200).json({ profile: data ? JSON.parse(data) : { fullName: '', department: '' } });
-    } catch {
+      let profile = { fullName: '', department: '' };
+      
+      if (data) {
+        try {
+          profile = typeof data === 'string' ? JSON.parse(data) : data;
+        } catch {
+          profile = { fullName: '', department: '' };
+        }
+      }
+      
+      res.status(200).json({ profile });
+    } catch (error) {
       res.status(200).json({ profile: { fullName: '', department: '' } });
     }
     return;
   }
 
-  // POST — сохранить профиль
   if (req.method === 'POST') {
-    const { fullName, department } = req.body;
-    const current = await kv.get(key);
-    const profile = current ? JSON.parse(current) : {};
+    try {
+      const { fullName, department } = req.body;
+      const data = await kv.get(key);
+      let profile = { fullName: '', department: '' };
+      
+      if (data) {
+        try {
+          profile = typeof data === 'string' ? JSON.parse(data) : data;
+        } catch {
+          profile = { fullName: '', department: '' };
+        }
+      }
 
-    if (fullName !== undefined) profile.fullName = fullName;
-    if (department !== undefined) profile.department = department;
+      if (fullName !== undefined) profile.fullName = fullName;
+      if (department !== undefined) profile.department = department;
 
-    await kv.set(key, JSON.stringify(profile));
-    res.status(200).json({ success: true, profile });
+      await kv.set(key, JSON.stringify(profile));
+      res.status(200).json({ success: true, profile });
+    } catch (error) {
+      console.error('Profile POST error:', error);
+      res.status(500).json({ error: error.message });
+    }
     return;
   }
 
