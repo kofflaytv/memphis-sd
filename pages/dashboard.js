@@ -77,15 +77,22 @@ export default function Dashboard() {
             onMouseEnter={e => e.currentTarget.style.borderColor = '#5865F2'}
             onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
           />
-          <span 
-            onClick={() => router.push('/profile')}
-            style={{ cursor:'pointer',transition:'color 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.color = 'white'}
-            onMouseLeave={e => e.currentTarget.style.color = '#8b8ba7'}
+          <button 
+            onClick={() => router.push('/profile')} 
+            style={{ background:'rgba(88,101,242,0.2)',color:'white',border:'1px solid rgba(88,101,242,0.4)',padding:'8px 16px',borderRadius:'8px',cursor:'pointer',fontSize:'14px',transition:'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(88,101,242,0.35)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(88,101,242,0.2)'}
           >
-            {user.username}
-          </span>
-          <button onClick={handleLogout} style={{ background:'rgba(255,255,255,0.08)',color:'white',border:'1px solid rgba(255,255,255,0.15)',padding:'8px 16px',borderRadius:'8px',cursor:'pointer' }}>Выйти</button>
+            👤 Профиль
+          </button>
+          <button 
+            onClick={handleLogout} 
+            style={{ background:'rgba(220,53,69,0.1)',color:'#ff6b6b',border:'1px solid rgba(220,53,69,0.4)',padding:'8px 16px',borderRadius:'8px',cursor:'pointer',fontSize:'14px',transition:'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(220,53,69,0.25)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(220,53,69,0.1)'}
+          >
+            Выйти
+          </button>
         </div>
       </div>
 
