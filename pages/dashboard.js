@@ -43,7 +43,6 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, today: 0 });
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch('/api/me').then(r => r.json()).then(d => {
@@ -58,12 +57,6 @@ export default function Dashboard() {
     router.push('/');
   };
 
-  const copyId = () => {
-    navigator.clipboard.writeText(user.id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   if (loading) return (
     <div style={{ display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0a1a',color:'white' }}>
       <div style={{ width:'50px',height:'50px',border:'4px solid rgba(88,101,242,0.15)',borderTopColor:'#5865F2',borderRadius:'50%',animation:'spin 1s linear infinite' }} />
@@ -76,12 +69,22 @@ export default function Dashboard() {
       <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',maxWidth:'1200px',margin:'0 auto 30px',padding:'20px',background:'rgba(255,255,255,0.03)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.08)' }}>
         <h1 style={{ fontSize:'28px',margin:0 }}>🏛️ LSCSD Forms</h1>
         <div style={{ display:'flex',alignItems:'center',gap:'12px',color:'#8b8ba7' }}>
-          <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} alt="Avatar" style={{ width:'40px',height:'40px',borderRadius:'50%' }} />
-          <span>{user.username}</span>
-          <span style={{ fontSize:'13px',background:'rgba(255,255,255,0.05)',padding:'4px 10px',borderRadius:'6px' }}>{user.id}</span>
-          <button onClick={copyId} style={{ background:'rgba(255,255,255,0.08)',color:'white',border:'1px solid rgba(255,255,255,0.15)',padding:'6px 12px',borderRadius:'8px',cursor:'pointer',fontSize:'14px',transition:'all 0.2s' }}>
-            {copied ? '✅ Скопировано' : '📋 Копировать ID'}
-          </button>
+          <img 
+            src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} 
+            alt="Avatar" 
+            onClick={() => router.push('/profile')}
+            style={{ width:'40px',height:'40px',borderRadius:'50%',cursor:'pointer',border:'2px solid transparent',transition:'border-color 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = '#5865F2'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
+          />
+          <span 
+            onClick={() => router.push('/profile')}
+            style={{ cursor:'pointer',transition:'color 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.color = 'white'}
+            onMouseLeave={e => e.currentTarget.style.color = '#8b8ba7'}
+          >
+            {user.username}
+          </span>
           <button onClick={handleLogout} style={{ background:'rgba(255,255,255,0.08)',color:'white',border:'1px solid rgba(255,255,255,0.15)',padding:'8px 16px',borderRadius:'8px',cursor:'pointer' }}>Выйти</button>
         </div>
       </div>
@@ -110,28 +113,20 @@ export default function Dashboard() {
             <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:'15px' }}>
               {cat.items.map(item => (
                 <div key={item.id} onClick={() => router.push(`/forms/${item.id}`)} 
-                  style={{ 
-                    background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',
-                    border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',
-                    padding:'25px',cursor:'pointer',textAlign:'center',
-                    position:'relative',overflow:'hidden',transition:'all 0.3s'
-                  }}
+                  style={{ background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',padding:'25px',cursor:'pointer',textAlign:'center',position:'relative',overflow:'hidden',transition:'all 0.3s' }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = 'translateY(-5px) scale(1.02)';
                     e.currentTarget.style.borderColor = cat.color;
-                    e.currentTarget.style.boxShadow = `0 15px 40px ${cat.color}30, 0 0 20px ${cat.color}15`;
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${cat.color}30`;
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = '';
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
                     e.currentTarget.style.boxShadow = '';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
                   }}
                 >
-                  <div style={{ position:'absolute',top:0,left:0,width:'4px',height:'100%',background:cat.color,transition:'width 0.3s' }} />
-                  <div style={{ position:'absolute',top:'50%',left:'50%',width:'150px',height:'150px',background:`${cat.color}10`,borderRadius:'50%',transform:'translate(-50%,-50%)',filter:'blur(40px)',opacity:0,transition:'opacity 0.3s' }} className="glow" />
-                  <div style={{ fontSize:'36px',marginBottom:'10px',transition:'transform 0.3s' }} className="icon">{item.icon}</div>
+                  <div style={{ position:'absolute',top:0,left:0,width:'4px',height:'100%',background:cat.color }}></div>
+                  <div style={{ fontSize:'36px',marginBottom:'10px' }}>{item.icon}</div>
                   <h3 style={{ fontSize:'16px',marginBottom:'8px' }}>{item.title}</h3>
                   <p style={{ color:'#8b8ba7',fontSize:'13px',margin:0 }}>{item.description}</p>
                 </div>
@@ -140,11 +135,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
-      <style>{`
-        .card:hover .glow { opacity: 1 !important; }
-        .card:hover .icon { transform: scale(1.2); }
-      `}</style>
     </div>
   );
 }
