@@ -6,6 +6,7 @@ export default function ResignationForm() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [profile, setProfile] = useState({ fullName: '' });
   const [formData, setFormData] = useState({
     fullName: '',
     screenshot: ''
@@ -20,6 +21,14 @@ export default function ResignationForm() {
           return;
         }
         setUser(data.user);
+      });
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        setProfile(data.profile);
+        if (data.profile.fullName) {
+          setFormData(prev => ({ ...prev, fullName: data.profile.fullName }));
+        }
         setLoading(false);
       });
   }, []);
@@ -73,13 +82,15 @@ export default function ResignationForm() {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Имя Фамилия + Статик *</label>
+            <label>Имя Фамилия + Статик * {profile.fullName && <span style={{ color:'#4CAF50',fontSize:'12px' }}>(из профиля)</span>}</label>
             <input 
               type="text" 
               required
               value={formData.fullName}
               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
               placeholder="Например: Sanya Suspect 270726"
+              disabled={!!profile.fullName}
+              className={profile.fullName ? 'disabled-input' : ''}
             />
           </div>
 
