@@ -86,12 +86,34 @@ export default async function handler(req, res) {
 
   const allText = Object.values(formData).filter(v => typeof v === 'string').join(' ');
 
-  // Банворды без бана
+  // Банворды без бана + указание поля
   if (!isWhitelisted && containsBadWords(allText)) {
     const foundWord = findBadWord(allText);
+    
+    const fieldNames = {
+      fullName: 'Имя Фамилия + Статик', age: 'Возраст', experience: 'Опыт работы',
+      lawKnowledge: 'Знание законов', passport: 'Скриншот паспорта', militaryId: 'Военный билет',
+      medical: 'Мед. справки', reason: 'Причина', rank: 'Ранг', weapon: 'Оружие',
+      currentDepartment: 'Текущий отдел', targetDepartment: 'Желаемый отдел',
+      startDate: 'Дата начала', endDate: 'Дата окончания', rankRange: 'Диапазон рангов',
+      reportLink: 'Ссылка на отчет', workLink: 'Ссылка на работу', workLinks: 'Ссылки на работу',
+      screenshot: 'Скриншот', rankProof: 'Доказательство ранга', approvalProof: 'Одобрение',
+      stateFractionsProof: 'Скрин одобрения', rankAtDismissal: 'Ранг при увольнении',
+      dbWhatIs: 'Что такое DB', dbExperience: 'Опыт в DB', dbExamples: 'Примеры работ',
+      dbServers: 'Серверы с DB', dbKnowledge: 'Знания DB', dbLawKnowledge: 'Знания законки'
+    };
+
+    let fieldName = 'заявке';
+    for (const [key, value] of Object.entries(formData)) {
+      if (typeof value === 'string' && value.toLowerCase().includes(foundWord.toLowerCase())) {
+        fieldName = fieldNames[key] || key;
+        break;
+      }
+    }
+
     await sendBanWordAlert(user, foundWord, allText, type, req);
     return res.status(400).json({ 
-      error: `❌ В заявке найдено запрещённое слово: "${foundWord}". Форма не отправлена.` 
+      error: `❌ В поле "${fieldName}" найдено запрещённое слово: "${foundWord}". Форма не отправлена.` 
     });
   }
 
