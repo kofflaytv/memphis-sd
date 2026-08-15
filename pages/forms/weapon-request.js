@@ -45,6 +45,7 @@ export default function WeaponRequestForm() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [profile, setProfile] = useState({ fullName: '', department: '' });
   const [formData, setFormData] = useState({
     fullName: '',
     department: '',
@@ -61,6 +62,16 @@ export default function WeaponRequestForm() {
           return;
         }
         setUser(data.user);
+      });
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        setProfile(data.profile);
+        setFormData(prev => ({
+          ...prev,
+          fullName: data.profile.fullName || '',
+          department: data.profile.department || ''
+        }));
         setLoading(false);
       });
   }, []);
@@ -139,23 +150,27 @@ export default function WeaponRequestForm() {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Имя Фамилия + Статик *</label>
+            <label>Имя Фамилия + Статик * {profile.fullName && <span style={{ color:'#4CAF50',fontSize:'12px' }}>(из профиля)</span>}</label>
             <input 
               type="text" 
               required
               value={formData.fullName}
               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
               placeholder="Например: Sanya Suspect 270726"
+              disabled={!!profile.fullName}
+              className={profile.fullName ? 'disabled-input' : ''}
             />
           </div>
 
           <div className="form-group">
-            <label>Отдел *</label>
+            <label>Отдел * {profile.department && <span style={{ color:'#4CAF50',fontSize:'12px' }}>(из профиля)</span>}</label>
             <select
               required
               value={formData.department}
               onChange={(e) => setFormData({...formData, department: e.target.value, weapon: ''})}
               className="select-input"
+              disabled={!!profile.department}
+              style={profile.department ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
             >
               <option value="">-- Выберите отдел --</option>
               {DEPARTMENTS.map(dept => (
