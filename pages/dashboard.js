@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, today: 0 });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch('/api/me').then(r => r.json()).then(d => {
@@ -57,6 +58,12 @@ export default function Dashboard() {
     router.push('/');
   };
 
+  const copyId = () => {
+    navigator.clipboard.writeText(user.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (loading) return (
     <div style={{ display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0a1a',color:'white' }}>
       Загрузка...
@@ -67,9 +74,13 @@ export default function Dashboard() {
     <div style={{ minHeight:'100vh',background:'linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 100%)',padding:'30px',color:'white' }}>
       <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',maxWidth:'1200px',margin:'0 auto 30px',padding:'20px',background:'rgba(255,255,255,0.03)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.08)' }}>
         <h1 style={{ fontSize:'28px',margin:0 }}>🏛️ LSCSD Forms</h1>
-        <div style={{ display:'flex',alignItems:'center',gap:'15px',color:'#8b8ba7' }}>
+        <div style={{ display:'flex',alignItems:'center',gap:'12px',color:'#8b8ba7' }}>
           <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} alt="Avatar" style={{ width:'40px',height:'40px',borderRadius:'50%' }} />
           <span>{user.username}</span>
+          <span style={{ fontSize:'13px',background:'rgba(255,255,255,0.05)',padding:'4px 10px',borderRadius:'6px' }}>{user.id}</span>
+          <button onClick={copyId} style={{ background:'rgba(255,255,255,0.08)',color:'white',border:'1px solid rgba(255,255,255,0.15)',padding:'6px 12px',borderRadius:'8px',cursor:'pointer',fontSize:'14px',transition:'all 0.2s' }}>
+            {copied ? '✅ Скопировано' : '📋 Копировать ID'}
+          </button>
           <button onClick={handleLogout} style={{ background:'rgba(255,255,255,0.08)',color:'white',border:'1px solid rgba(255,255,255,0.15)',padding:'8px 16px',borderRadius:'8px',cursor:'pointer' }}>Выйти</button>
         </div>
       </div>
@@ -98,7 +109,17 @@ export default function Dashboard() {
             <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:'15px' }}>
               {cat.items.map(item => (
                 <div key={item.id} onClick={() => router.push(`/forms/${item.id}`)} 
-                  style={{ background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',padding:'25px',cursor:'pointer',textAlign:'center',position:'relative',overflow:'hidden' }}
+                  style={{ background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',padding:'25px',cursor:'pointer',textAlign:'center',position:'relative',overflow:'hidden',transition:'all 0.3s' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.borderColor = cat.color;
+                    e.currentTarget.style.boxShadow = `0 10px 30px ${cat.color}20`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                    e.currentTarget.style.boxShadow = '';
+                  }}
                 >
                   <div style={{ position:'absolute',top:0,left:0,width:'4px',height:'100%',background:cat.color }}></div>
                   <div style={{ fontSize:'36px',marginBottom:'10px' }}>{item.icon}</div>
