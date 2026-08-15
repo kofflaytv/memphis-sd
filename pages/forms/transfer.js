@@ -31,6 +31,7 @@ export default function TransferForm() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [profile, setProfile] = useState({ fullName: '', department: '' });
   const [formData, setFormData] = useState({
     fullName: '', rank: '', currentDepartment: '', targetDepartment: '', reason: '',
     dbWhatIs: '', dbExperience: '', dbExamples: '', dbServers: '', dbKnowledge: '', dbLawKnowledge: ''
@@ -56,7 +57,16 @@ export default function TransferForm() {
   useEffect(() => {
     fetch('/api/me').then(r => r.json()).then(d => {
       if (!d.user) { router.push('/'); return; }
-      setUser(d.user); setLoading(false);
+      setUser(d.user);
+    });
+    fetch('/api/profile').then(r => r.json()).then(d => {
+      setProfile(d.profile);
+      setFormData(prev => ({
+        ...prev,
+        fullName: d.profile.fullName || '',
+        currentDepartment: d.profile.department || ''
+      }));
+      setLoading(false);
     });
   }, []);
 
@@ -96,8 +106,8 @@ export default function TransferForm() {
         <h1 style={{ marginBottom:'30px',fontSize:'28px' }}>🔄 Перевод в отдел</h1>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom:'20px' }}>
-            <label style={{ display:'block',marginBottom:'8px',color:'#8b8ba7' }}>Имя Фамилия + Статик *</label>
-            <input type="text" required value={formData.fullName} onChange={e => setFormData({...formData,fullName:e.target.value})} placeholder="Sanya Suspect 270726" style={s} />
+            <label style={{ display:'block',marginBottom:'8px',color:'#8b8ba7' }}>Имя Фамилия + Статик * {profile.fullName && <span style={{ color:'#4CAF50',fontSize:'12px' }}>(из профиля)</span>}</label>
+            <input type="text" required value={formData.fullName} onChange={e => setFormData({...formData,fullName:e.target.value})} placeholder="Sanya Suspect 270726" disabled={!!profile.fullName} style={{...s,opacity:profile.fullName?0.5:1,cursor:profile.fullName?'not-allowed':'text'}} />
           </div>
           <div style={{ marginBottom:'20px' }}>
             <label style={{ display:'block',marginBottom:'8px',color:'#8b8ba7' }}>Ваш ранг *</label>
@@ -107,8 +117,8 @@ export default function TransferForm() {
             </select>
           </div>
           <div style={{ marginBottom:'20px' }}>
-            <label style={{ display:'block',marginBottom:'8px',color:'#8b8ba7' }}>Текущий отдел *</label>
-            <select required value={formData.currentDepartment} onChange={e => setFormData({...formData,currentDepartment:e.target.value})} style={{...s,appearance:'none',cursor:'pointer'}}>
+            <label style={{ display:'block',marginBottom:'8px',color:'#8b8ba7' }}>Текущий отдел * {profile.department && <span style={{ color:'#4CAF50',fontSize:'12px' }}>(из профиля)</span>}</label>
+            <select required value={formData.currentDepartment} onChange={e => setFormData({...formData,currentDepartment:e.target.value})} disabled={!!profile.department} style={{...s,appearance:'none',cursor:profile.department?'not-allowed':'pointer',opacity:profile.department?0.5:1}}>
               <option value="">-- Выберите отдел --</option>
               {DEPARTMENTS.map(d => <option key={d.id} value={d.id}>{d.emoji} {d.name}</option>)}
             </select>
