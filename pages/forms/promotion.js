@@ -70,7 +70,7 @@ export default function PromotionForm() {
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
