@@ -106,7 +106,7 @@ export default function ReportForm() {
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
