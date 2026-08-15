@@ -66,7 +66,8 @@ export default function Dashboard() {
 
   if (loading) return (
     <div style={{ display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0a1a',color:'white' }}>
-      Загрузка...
+      <div style={{ width:'50px',height:'50px',border:'4px solid rgba(88,101,242,0.15)',borderTopColor:'#5865F2',borderRadius:'50%',animation:'spin 1s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 
@@ -109,20 +110,28 @@ export default function Dashboard() {
             <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:'15px' }}>
               {cat.items.map(item => (
                 <div key={item.id} onClick={() => router.push(`/forms/${item.id}`)} 
-                  style={{ background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',padding:'25px',cursor:'pointer',textAlign:'center',position:'relative',overflow:'hidden',transition:'all 0.3s' }}
+                  style={{ 
+                    background:'rgba(255,255,255,0.03)',backdropFilter:'blur(10px)',
+                    border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',
+                    padding:'25px',cursor:'pointer',textAlign:'center',
+                    position:'relative',overflow:'hidden',transition:'all 0.3s'
+                  }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.transform = 'translateY(-5px) scale(1.02)';
                     e.currentTarget.style.borderColor = cat.color;
-                    e.currentTarget.style.boxShadow = `0 10px 30px ${cat.color}20`;
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${cat.color}30, 0 0 20px ${cat.color}15`;
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = '';
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
                     e.currentTarget.style.boxShadow = '';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
                   }}
                 >
-                  <div style={{ position:'absolute',top:0,left:0,width:'4px',height:'100%',background:cat.color }}></div>
-                  <div style={{ fontSize:'36px',marginBottom:'10px' }}>{item.icon}</div>
+                  <div style={{ position:'absolute',top:0,left:0,width:'4px',height:'100%',background:cat.color,transition:'width 0.3s' }} />
+                  <div style={{ position:'absolute',top:'50%',left:'50%',width:'150px',height:'150px',background:`${cat.color}10`,borderRadius:'50%',transform:'translate(-50%,-50%)',filter:'blur(40px)',opacity:0,transition:'opacity 0.3s' }} className="glow" />
+                  <div style={{ fontSize:'36px',marginBottom:'10px',transition:'transform 0.3s' }} className="icon">{item.icon}</div>
                   <h3 style={{ fontSize:'16px',marginBottom:'8px' }}>{item.title}</h3>
                   <p style={{ color:'#8b8ba7',fontSize:'13px',margin:0 }}>{item.description}</p>
                 </div>
@@ -131,6 +140,11 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      <style>{`
+        .card:hover .glow { opacity: 1 !important; }
+        .card:hover .icon { transform: scale(1.2); }
+      `}</style>
     </div>
   );
 }
