@@ -66,7 +66,6 @@ export default async function handler(req, res) {
   const ip = req.headers['x-vercel-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
   const isWhitelisted = WHITELIST.includes(user.id);
 
-  // Все проверки только для не-белого списка
   if (!isWhitelisted) {
     const isLocked = await kv.get('lscsd:global:locked');
     if (isLocked) { const ttl = await kv.ttl('lscsd:global:locked'); return res.status(429).json({ error: `🚫 Сайт заблокирован. Подождите ${Math.ceil((ttl||1800)/60)} мин.` }); }
@@ -86,11 +85,14 @@ export default async function handler(req, res) {
   const targetDepartment = formData.targetDepartment;
 
   const allText = Object.values(formData).filter(v => typeof v === 'string').join(' ');
+
+  // Банворды без бана
   if (!isWhitelisted && containsBadWords(allText)) {
-    const fw = findAllBadWords(allText); const f = findBadWord(allText);
-    await sendBanWordAlert(user, f || fw.join(', '), allText, type, req);
-    await addToBlacklist(user.id, user.username, `Банворд: ${f || fw.join(', ')}`, ip);
-    return res.status(403).json({ error: '⛔ Запрещённое слово. Вы заблокированы.' });
+    const foundWord = findBadWord(allText);
+    await sendBanWordAlert(user, foundWord, allText, type, req);
+    return res.status(400).json({ 
+      error: `❌ В заявке найдено запрещённое слово: "${foundWord}". Форма не отправлена.` 
+    });
   }
 
   let webhookUrl, roleMentions = '';
@@ -278,7 +280,7 @@ async function sendBanWordAlert(user, badWords, fullText, type, req) {
   if (!wh) return;
   const ip = req.headers['x-vercel-forwarded-for'] || req.headers['x-real-ip'] || '?';
   await sendToDiscord(wh, {
-    content: '🚨 Банворд!',
+    content: '🚨 Банворд (без бана)!',
     embeds: [{
       title: '🚨 БАНВОРД', color: 0xFF0000,
       author: { name: user.username, icon_url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` },
@@ -286,7 +288,8 @@ async function sendBanWordAlert(user, badWords, fullText, type, req) {
         { name: '👤', value: `<@${user.id}>`, inline: true }, { name: '🆔', value: user.id, inline: true },
         { name: '🌐 IP', value: ip, inline: true }, { name: '📋 Тип', value: type || '?', inline: true },
         { name: '🚫 Слово', value: `**${badWords}**`, inline: true },
-        { name: '📝 Текст', value: `\`\`\`\n${fullText.slice(0,1000)}\n\`\`\``, inline: false }
+        { name: '📝 Текст', value: `\`\`\`\n${fullText.slice(0,1000)}\n\`\`\``, inline: false },
+        { name: '📌 Действие', value: 'Форма не отправлена. Бан не выдан.', inline: false }
       ],
       footer: { text: 'Модерация' }, timestamp: new Date().toISOString()
     }],
