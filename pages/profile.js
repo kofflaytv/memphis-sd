@@ -32,11 +32,11 @@ export default function Profile() {
     fetch('/api/me').then(r => r.json()).then(d => {
       if (!d.user) { router.push('/'); return; }
       setUser(d.user);
+      setLoading(false);
     });
     fetch('/api/profile').then(r => r.json()).then(d => {
       setProfile(d.profile);
       setNewName(d.profile.fullName || '');
-      setLoading(false);
     });
   }, []);
 
@@ -67,12 +67,13 @@ export default function Profile() {
   };
 
   const copyId = () => {
+    if (!user) return;
     navigator.clipboard.writeText(user.id);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) return (
+  if (loading || !user) return (
     <div style={{ display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh',background:'#0a0a1a',color:'white' }}>
       Загрузка...
     </div>
@@ -87,7 +88,6 @@ export default function Profile() {
       </button>
 
       <div style={{ maxWidth:'600px',margin:'0 auto' }}>
-        {/* Профиль */}
         <div style={{ background:'rgba(255,255,255,0.05)',borderRadius:'20px',padding:'30px',border:'1px solid rgba(255,255,255,0.1)',textAlign:'center',marginBottom:'20px' }}>
           <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} alt="Avatar" style={{ width:'80px',height:'80px',borderRadius:'50%',border:'2px solid #5865F2' }} />
           <h1 style={{ margin:'15px 0 5px',fontSize:'24px' }}>{user.username}</h1>
@@ -97,7 +97,6 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Игровые данные */}
         <div style={{ background:'rgba(255,255,255,0.05)',borderRadius:'20px',padding:'30px',border:'1px solid rgba(255,255,255,0.1)',marginBottom:'20px' }}>
           <h2 style={{ fontSize:'18px',marginBottom:'15px' }}>🎮 Игровые данные</h2>
           {editingName ? (
@@ -123,7 +122,6 @@ export default function Profile() {
           )}
         </div>
 
-        {/* Отдел */}
         <div style={{ background:'rgba(255,255,255,0.05)',borderRadius:'20px',padding:'30px',border:'1px solid rgba(255,255,255,0.1)',marginBottom:'20px' }}>
           <h2 style={{ fontSize:'18px',marginBottom:'15px' }}>🏢 Отдел</h2>
           {editingDept ? (
